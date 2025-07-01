@@ -11,10 +11,6 @@ app = FastAPI()
 DATABASE_URL = "postgresql://gokila:goki@localhost:5432/fastapi_db"
 engine = create_engine(DATABASE_URL, echo=True)
 
-# Create tables if not exists
- #This line ensures your tables are created on app start
-
-# ==================== DB MODELS ====================
 
 class Room(SQLModel, table=True):
     room_id: Optional[int] = Field(default=None, primary_key=True)
@@ -46,7 +42,6 @@ def create_db_and_tables():
 
 create_db_and_tables() 
 
-# ==================== RESPONSE MODELS ====================
 
 class RoomDetails(SQLModel):
     room_id: int
@@ -77,12 +72,10 @@ class ErrorResponse(SQLModel):
     message: str
     details: dict
 
-# ==================== UTILITY FUNCTION ====================
 
 def calculate_duration_hours(start: datetime, end: datetime) -> int:
     return int((end - start).total_seconds() // 3600)
 
-# ==================== MAIN API ====================
 
 @app.post("/check-availability")
 def check_availability(start_time: datetime, end_time: datetime):
