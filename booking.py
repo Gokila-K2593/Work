@@ -1,16 +1,16 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 from sqlmodel import SQLModel, Field, Session, create_engine, select
 from sqlalchemy import Column, String, ARRAY
 from datetime import datetime
 from typing import List, Optional, Union
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder#  FastAPI app creation
-app = FastAPI()
+from fastapi.encoders import jsonable_encoder
+from database import engine#  FastAPI app creation
 
-#DB connection
-DATABASE_URL = "postgresql://gokila:goki@localhost:5432/fastapi_db"
-engine = create_engine(DATABASE_URL, echo=True)
+ #  This line ensures your tables are created on app start
+booking_router=APIRouter()
 
+# ==================== DB MODELS ====================
 
 class Room(SQLModel, table=True):
     room_id: Optional[int] = Field(default=None, primary_key=True)
@@ -35,13 +35,8 @@ class Booking(SQLModel, table=True):
     total_cost: float
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    
-    
-def create_db_and_tables():
-        SQLModel.metadata.create_all(engine)
 
-create_db_and_tables() 
-
+# ==================== RESPONSE MODELS ====================
 
 class RoomDetails(SQLModel):
     room_id: int
@@ -72,12 +67,14 @@ class ErrorResponse(SQLModel):
     message: str
     details: dict
 
+# ==================== UTILITY FUNCTION ====================
 
 def calculate_duration_hours(start: datetime, end: datetime) -> int:
     return int((end - start).total_seconds() // 3600)
 
+# ==================== MAIN API ====================
 
-@app.post("/check-availability")
+@booking_router.post("/check-availability")
 def check_availability(start_time: datetime, end_time: datetime):
     if end_time <= start_time:
         return ErrorResponse(
