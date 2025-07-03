@@ -10,7 +10,6 @@ from database import engine#  FastAPI app creation
  #  This line ensures your tables are created on app start
 booking_router=APIRouter()
 
-# ==================== DB MODELS ====================
 
 class Room(SQLModel, table=True):
     room_id: Optional[int] = Field(default=None, primary_key=True)
@@ -31,12 +30,11 @@ class Booking(SQLModel, table=True):
     start_time: datetime
     end_time: datetime
     booked_by: str
-    booking_status: str  # confirmed, cancelled, etc.
+    booking_status: str 
     total_cost: float
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
-# ==================== RESPONSE MODELS ====================
 
 class RoomDetails(SQLModel):
     room_id: int
@@ -67,12 +65,9 @@ class ErrorResponse(SQLModel):
     message: str
     details: dict
 
-# ==================== UTILITY FUNCTION ====================
-
 def calculate_duration_hours(start: datetime, end: datetime) -> int:
     return int((end - start).total_seconds() // 3600)
 
-# ==================== MAIN API ====================
 
 @booking_router.post("/check-availability")
 def check_availability(start_time: datetime, end_time: datetime):
